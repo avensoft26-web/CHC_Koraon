@@ -1,0 +1,47 @@
+{
+  "name": "Chaudhary Health Care Center - HMS",
+  "short_name": "Chaudhary HMS",
+  "description": "Hospital Management System & Clinical Care for Chaudhary Health Care Center",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#172554",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/chaudhary_logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/chaudhary_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["medical", "health", "productivity", "hospital"],
+  "shortcuts": [
+    {
+      "name": "Staff Portal",
+      "short_name": "Staff",
+      "description": "Open Staff & Nurse Ward Dashboard",
+      "url": "/",
+      "icons": [{ "src": "/chaudhary_logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Doctor Portal",
+      "short_name": "Doctor",
+      "description": "Open Doctor Clinical Dashboard",
+      "url": "/",
+      "icons": [{ "src": "/chaudhary_logo.png", "sizes": "192x192" }]
+    }
+  ]
+}
