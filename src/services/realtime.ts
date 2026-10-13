@@ -1,7 +1,7 @@
-﻿import { io, Socket } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { invalidateApiCache } from './api';
 
-// â”€â”€ Real-time channel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Real-time channel ────────────────────────────────────────────────────────
 // The backend already broadcasts hospital events (patient:admitted,
 // patient:updated, patient:discharged, bed:updated, note:added, billing:paid)
 // over Socket.IO. Until now no client ever connected, so every cross-role
@@ -66,7 +66,7 @@ function ensureSocket(): Socket | null {
     }
   }
 
-  const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || '';
+  const apiBase = import.meta.env.VITE_API_BASE_URL || '';
   const socketOrigin = apiBase && apiBase.startsWith('http')
     ? new URL(apiBase).origin
     : undefined;
@@ -86,7 +86,7 @@ function ensureSocket(): Socket | null {
   socket.on('connect_error', (err: any) => {
     const msg = String(err?.message || '').toLowerCase();
     if (msg.includes('unauthorized') || msg.includes('token')) {
-      console.warn('[Socket.IO] Handshake unauthorized â€” stopping reconnect:', err.message);
+      console.warn('[Socket.IO] Handshake unauthorized — stopping reconnect:', err.message);
       socket?.disconnect();
       socket = null;
     }
