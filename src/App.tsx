@@ -1,4 +1,6 @@
-import React, { useState, useEffect, Suspense } from 'react';
+﻿import React, { useState, useEffect, Suspense } from 'react';
+import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
+import { PublicSiteApp } from './public-site/PublicSiteApp';
 import { LoginPage, AuthUser } from './features/auth/LoginPage';
 import { SignUpPage } from './features/auth/SignUpPage';
 import { HospitalProvider, useHospitalContext } from './context/HospitalContext';
@@ -105,15 +107,16 @@ const getInitialAuthUser = (): AuthUser | null => {
 };
 
 export function App() {
-  // 🔒 SECURITY: the session is NOT hydrated from localStorage on first
+  const navigate = useNavigate();
+  // ðŸ”’ SECURITY: the session is NOT hydrated from localStorage on first
   // render. It previously was (`useState(getInitialAuthUser)`), which painted
-  // the full portal — ADMIN included — from a client-side cache before the
+  // the full portal â€” ADMIN included â€” from a client-side cache before the
   // server had confirmed anything, on every reload.
   //
   // Local storage is a cache, not an authority. The session is now resolved by
   // the server in the effect below; until it answers, the app shows the
   // verification splash and nothing else. `getInitialAuthUser` survives purely
-  // to answer "is there a stored token to verify?" — it never renders UI.
+  // to answer "is there a stored token to verify?" â€” it never renders UI.
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(() => {
@@ -131,6 +134,7 @@ export function App() {
         const hasToken = Boolean(localStorage.getItem('chaudhary_jwt_token') || localStorage.getItem('auth_token'));
         if (!hasToken) {
           setCurrentUser(null);
+    navigate('/');
           setIsCheckingAuth(false);
           return;
         }
@@ -138,9 +142,9 @@ export function App() {
       }
     };
 
-    // 🔒 SECURITY: this handler used to call setCurrentUser(getInitialAuthUser()),
+    // ðŸ”’ SECURITY: this handler used to call setCurrentUser(getInitialAuthUser()),
     // i.e. render whatever was in localStorage. Anything that could write to
-    // localStorage — an XSS payload, a shared machine, an extension — could
+    // localStorage â€” an XSS payload, a shared machine, an extension â€” could
     // therefore paint an authenticated portal here.
     //
     // It now triggers the same server verification as a fresh page load. The
@@ -152,6 +156,7 @@ export function App() {
       );
       if (!hasToken) {
         setCurrentUser(null);
+    navigate('/');
         setIsCheckingAuth(false);
         return;
       }
@@ -176,6 +181,7 @@ export function App() {
       if (!token) {
         if (isMounted) {
           setCurrentUser(null);
+    navigate('/');
           setIsCheckingAuth(false);
         }
         return;
@@ -225,16 +231,16 @@ export function App() {
       } catch (err: any) {
         // The backend could not be reached OR explicitly rejected the session.
         //
-        // 🔒 SECURITY: the previous code logged out only on 401/403 and
+        // ðŸ”’ SECURITY: the previous code logged out only on 401/403 and
         // otherwise restored a cached user object from localStorage, rendering
-        // a fully working portal — including ADMIN — with no server validation.
+        // a fully working portal â€” including ADMIN â€” with no server validation.
         // Any client able to make the API unreachable (outage, DNS failure, or
         // simply stopping the server) was handed an administrator interface.
         // Client storage is a cache, never an authority.
         //
         // On a 401/403 the session is genuinely revoked: clear it. On any other
         // failure the session is simply UNVERIFIED, which is not the same as
-        // revoked — but it is also not permission to proceed. Show the login
+        // revoked â€” but it is also not permission to proceed. Show the login
         // screen and keep the token, so a genuine transient outage does not
         // force the user to type their password again.
         if (err?.status === 401 || err?.status === 403) {
@@ -248,6 +254,7 @@ export function App() {
         }
         window.dispatchEvent(new Event('chaudhary_auth_updated'));
         if (isMounted) setCurrentUser(null);
+    navigate('/');
       } finally {
         if (isMounted) setIsCheckingAuth(false);
       }
@@ -278,6 +285,7 @@ export function App() {
     disconnectSocket();
     window.dispatchEvent(new Event('chaudhary_auth_updated'));
     setCurrentUser(null);
+    navigate('/');
   };
 
   // Session verification loading splash
@@ -295,36 +303,86 @@ export function App() {
     );
   }
 
-  // If not authenticated, require real login or signup
-  if (!currentUser) {
-    if (authView === 'signup') {
-      return (
-        <>
-          <OfflineStatusIndicator />
-          <SignUpPage 
-            onNavigateToLogin={() => setAuthView('login')} 
-            onLogin={(user) => setCurrentUser(user)}
-          />
-        </>
-      );
-    }
-    return (
-      <>
-        <OfflineStatusIndicator />
-        <LoginPage 
-          onLogin={(user) => setCurrentUser(user)} 
-          onNavigateToSignUp={() => setAuthView('signup')} 
-        />
-      </>
-    );
-  }
-
   return (
-    <HospitalProvider>
-      <OfflineStatusIndicator />
-      <AuthenticatedApp currentUser={currentUser} onLogout={handleLogout} />
-    </HospitalProvider>
+    <Routes>
+      {/* 1. HMS Staff Login Page */}
+      <Route
+        path="/login"
+        element={
+          currentUser ? (
+            <Navigate to="/portal" replace />
+          ) : (
+            <div className="relative min-h-screen">
+              <div className="absolute top-4 left-4 z-50">
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 rounded-xl shadow-md border border-slate-200 text-xs font-semibold backdrop-blur-sm transition-all"
+                >
+                  ← Back to Hospital Website
+                </Link>
+              </div>
+              <OfflineStatusIndicator />
+              <LoginPage
+                onLogin={(user) => {
+                  setCurrentUser(user);
+                  navigate('/portal');
+                }}
+                onNavigateToSignUp={() => navigate('/signup')}
+              />
+            </div>
+          )
+        }
+      />
+
+      {/* 2. HMS Staff SignUp Page */}
+      <Route
+        path="/signup"
+        element={
+          currentUser ? (
+            <Navigate to="/portal" replace />
+          ) : (
+            <div className="relative min-h-screen">
+              <div className="absolute top-4 left-4 z-50">
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 rounded-xl shadow-md border border-slate-200 text-xs font-semibold backdrop-blur-sm transition-all"
+                >
+                  ← Back to Hospital Website
+                </Link>
+              </div>
+              <OfflineStatusIndicator />
+              <SignUpPage
+                onLogin={(user) => {
+                  setCurrentUser(user);
+                  navigate('/portal');
+                }}
+                onNavigateToLogin={() => navigate('/login')}
+              />
+            </div>
+          )
+        }
+      />
+
+      {/* 3. Protected Authenticated Hospital Portals */}
+      <Route
+        path="/portal/*"
+        element={
+          currentUser ? (
+            <HospitalProvider>
+              <OfflineStatusIndicator />
+              <AuthenticatedApp currentUser={currentUser} onLogout={handleLogout} />
+            </HospitalProvider>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* 4. Public Hospital Website (Home, About, Doctors, Services, Gallery, Appointments, Contact) */}
+      <Route path="/*" element={<PublicSiteApp />} />
+    </Routes>
   );
 }
 
 export default App;
+
