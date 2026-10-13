@@ -1,0 +1,6 @@
+﻿# Robots.txt for Chaudhary Health Care Center
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://avensoft26.github.io/CHC_Koraon/sitemap.xml
