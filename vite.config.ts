@@ -1,6 +1,8 @@
 ﻿import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+const BACKEND_URL = 'https://chc-backend-u2ow.onrender.com'
+
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
@@ -14,13 +16,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: BACKEND_URL,
         changeOrigin: true,
+        secure: false,
       },
       '/socket.io': {
-        target: 'http://127.0.0.1:5000',
+        target: BACKEND_URL,
         changeOrigin: true,
         ws: true,
+        secure: false,
         configure: (proxy) => {
           proxy.on('error', (err: any) => {
             // Suppress normal WebSocket disconnects / tab refresh aborts
@@ -40,8 +44,9 @@ export default defineConfig({
         },
       },
       '/uploads': {
-        target: 'http://127.0.0.1:5000',
+        target: BACKEND_URL,
         changeOrigin: true,
+        secure: false,
       },
     },
   },
