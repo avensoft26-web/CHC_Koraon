@@ -1,7 +1,7 @@
-﻿import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-const BACKEND_URL = 'https://chc-backend-u2ow.onrender.com'
+const BACKEND_URL = 'http://localhost:5000'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -51,3 +51,4 @@ export default defineConfig({
     },
   },
 })
+

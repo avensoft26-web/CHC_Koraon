@@ -3,7 +3,9 @@
 // Connects Frontend to Express + MongoDB Backend
 // ==========================================
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE = import.meta.env.DEV
+  ? 'http://localhost:5000/api'
+  : (import.meta.env.VITE_API_BASE_URL || 'https://chc-backend-u2ow.onrender.com/api');
 
 function getStoredToken(): string | null {
   try {
@@ -104,7 +106,7 @@ export function autoInvalidateCacheOnMutation(url: string) {
 // Concurrent identical GETs are coalesced into a single network request. On most
 // screens several components request the same collection in the same tick (the
 // global patient list in HospitalContext plus the view's own copy), so this cuts
-// real duplicate traffic without changing any caller's semantics — a GET issued
+// real duplicate traffic without changing any caller's semantics â€” a GET issued
 // after the previous one resolves still performs a fresh read.
 const inflightGets = new Map<string, Promise<any>>();
 
@@ -199,7 +201,7 @@ async function request<T>(endpoint: string, options: RequestInit & { bypassCache
 }
 
 export const api = {
-  // ── Authentication ──
+  // â”€â”€ Authentication â”€â”€
   auth: {
     login: async (credentials: { email: string; password: string }) => {
       const data = await request<{
@@ -290,7 +292,7 @@ export const api = {
       }),
   },
 
-  // ── Patients ──
+  // â”€â”€ Patients â”€â”€
   patients: {
     getAll: () => request<{ success: boolean; patients: any[] }>('/patients'),
     getById: (id: string) => request<{ success: boolean; patient: any }>(`/patients/${id}`),
@@ -332,7 +334,7 @@ export const api = {
       }),
   },
 
-  // ── Clinical Daily Notes ──
+  // â”€â”€ Clinical Daily Notes â”€â”€
   notes: {
     getAll: () => request<{ success: boolean; notes: any[] }>('/notes'),
     getByPatient: (patientId: string) =>
@@ -349,7 +351,7 @@ export const api = {
       }),
   },
 
-  // ── Appointments ──
+  // â”€â”€ Appointments â”€â”€
   appointments: {
     getAll: (filters?: { date?: string; doctor_id?: string; status?: string }) => {
       const params = new URLSearchParams();
@@ -375,7 +377,7 @@ export const api = {
       }),
   },
 
-  // ── Doctors & Staff ──
+  // â”€â”€ Doctors & Staff â”€â”€
   doctors: {
     getAll: () => request<{ success: boolean; doctors: any[] }>('/doctors'),
     update: (id: string, updates: any) =>
@@ -388,7 +390,7 @@ export const api = {
     getAll: () => request<{ success: boolean; staff: any[] }>('/staff'),
   },
 
-  // ── Beds & Wards ──
+  // â”€â”€ Beds & Wards â”€â”€
   beds: {
     getAll: () =>
       request<{
@@ -398,7 +400,7 @@ export const api = {
       }>('/beds'),
   },
 
-  // ── Medicines & Pharmacy ──
+  // â”€â”€ Medicines & Pharmacy â”€â”€
   medicines: {
     getAll: () => request<{ success: boolean; medicines: any[] }>('/medicines'),
     create: (medData: any) =>
@@ -417,7 +419,7 @@ export const api = {
       }),
   },
 
-  // ── Clinical Vitals ──
+  // â”€â”€ Clinical Vitals â”€â”€
   vitals: {
     getAll: (patientId?: string) => {
       const query = patientId ? `?patient_id=${patientId}` : '';
@@ -430,7 +432,7 @@ export const api = {
       }),
   },
 
-  // ── Billing ──
+  // â”€â”€ Billing â”€â”€
   billing: {
     getAll: () => request<{ success: boolean; billings: any[] }>('/billing'),
     getByPatient: (patientId: string) =>
@@ -458,7 +460,7 @@ export const api = {
       ),
   },
 
-  // ── Discharge ──
+  // â”€â”€ Discharge â”€â”€
   discharge: {
     getByPatient: (patientId: string) =>
       request<{ success: boolean; discharge: any }>(`/discharge/${patientId}`),
@@ -471,7 +473,7 @@ export const api = {
       }),
   },
 
-  // ── Live Notifications ──
+  // â”€â”€ Live Notifications â”€â”€
   notifications: {
     getAll: () => request<{ success: boolean; total?: number; notifications: any[] }>('/notifications'),
     send: (data: { title: string; body: string; targetRole?: string }) =>
@@ -481,7 +483,7 @@ export const api = {
       }),
   },
 
-  // ── Audit Trail (admin only) ──
+  // â”€â”€ Audit Trail (admin only) â”€â”€
   audit: {
     get: (filters?: { entityType?: string; entityId?: string; action?: string; limit?: number }) => {
       const params = new URLSearchParams();
@@ -541,7 +543,7 @@ export const api = {
     },
   },
 
-  // ── Hospital Settings ──
+  // â”€â”€ Hospital Settings â”€â”€
   settings: {
     get: () => request<{ success: boolean; settings: Record<string, any> }>('/settings'),
     update: (settingsData: Record<string, any>) =>
@@ -551,7 +553,7 @@ export const api = {
       }),
   },
 
-  // ── Clinical Handovers (SBAR) ──
+  // â”€â”€ Clinical Handovers (SBAR) â”€â”€
   handovers: {
     getAll: () => request<{ success: boolean; handovers: any[] }>('/handovers'),
     create: (data: any) =>
@@ -561,7 +563,7 @@ export const api = {
       }),
   },
 
-  // ── Doctor Ward Orders ──
+  // â”€â”€ Doctor Ward Orders â”€â”€
   wardOrders: {
     getAll: () => request<{ success: boolean; orders: any[] }>('/ward-orders'),
     create: (data: any) =>
@@ -576,7 +578,7 @@ export const api = {
       }),
   },
 
-  // Runtime / server health — real values read from the backend
+  // Runtime / server health â€” real values read from the backend
   system: {
     health: () =>
       request<{
@@ -600,3 +602,4 @@ export const api = {
     },
   },
 };
+
