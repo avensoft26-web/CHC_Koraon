@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import { PublicSiteApp } from './public-site/PublicSiteApp';
 import { LoginPage, AuthUser } from './features/auth/LoginPage';
@@ -312,15 +312,7 @@ export function App() {
           currentUser ? (
             <Navigate to="/portal" replace />
           ) : (
-            <div className="relative min-h-screen">
-              <div className="absolute top-4 left-4 z-50">
-                <Link
-                  to="/"
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 rounded-xl shadow-md border border-slate-200 text-xs font-semibold backdrop-blur-sm transition-all"
-                >
-                  ← Back to Hospital Website
-                </Link>
-              </div>
+            <div className="min-h-screen">
               <OfflineStatusIndicator />
               <LoginPage
                 onLogin={(user) => {
@@ -341,15 +333,7 @@ export function App() {
           currentUser ? (
             <Navigate to="/portal" replace />
           ) : (
-            <div className="relative min-h-screen">
-              <div className="absolute top-4 left-4 z-50">
-                <Link
-                  to="/"
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 rounded-xl shadow-md border border-slate-200 text-xs font-semibold backdrop-blur-sm transition-all"
-                >
-                  ← Back to Hospital Website
-                </Link>
-              </div>
+            <div className="min-h-screen">
               <OfflineStatusIndicator />
               <SignUpPage
                 onLogin={(user) => {
